@@ -1,0 +1,29 @@
+{
+  "auth_token": "",
+  "email": "YOUR_EMAIL_HERE",
+  "password": "YOUR_PASSWORD_HERE",
+  "base_url": "https://gaccode.com/api",
+  "ticket_config": {
+    "category_id": 3,
+    "title": "重置积分",
+    "description": "",
+    "language": "zh"
+  },
+  "retry_config": {
+    "max_retries": 3,
+    "retry_delay": 2
+  },
+  "email_alerts": {
+    "enabled": true,
+    "smtp_server": "smtp.163.com",
+    "smtp_port": 465,
+    "smtp_user": "your_email@163.com",
+    "smtp_password": "YOUR_SMTP_AUTH_CODE",
+    "from_email": "your_email@163.com",
+    "to_email": "your_email@163.com",
+    "on_failure": true,
+    "on_success": false,
+    "on_token_refresh": true
+  }
+}
+
