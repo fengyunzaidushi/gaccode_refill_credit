@@ -160,7 +160,7 @@ jobs:
       # 8. 上传日志（可选）
       - name: 上传执行日志
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: reset-logs-${{ github.run_id }}
           path: |
