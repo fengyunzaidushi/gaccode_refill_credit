@@ -573,6 +573,14 @@ GAC积分重置工具通知
                 print(f"[INFO] Last reset time: {reset_time}")
                 print(f"[INFO] Please wait until tomorrow to reset again.")
                 print("=" * 60)
+                
+                # Send email notification for already reset
+                self.send_email_alert(
+                    "今日已重置 - 无需操作",
+                    f"今天已经完成积分重置，无需重复操作。\n\n上次重置时间: {reset_time}\n\n请等待明天再次重置。",
+                    "info"
+                )
+                
                 return True  # Return True because no error occurred
         else:
             print("[INFO] ✓ No reset found today, proceeding...")
