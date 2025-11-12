@@ -147,7 +147,7 @@ python -m pip install requests
 
 **解决:**
 
-- 每天最多 3 次重置
+- 每天最多 1 次重置
 - 等待第二天再试
 
 ### 问题: config.json not found
