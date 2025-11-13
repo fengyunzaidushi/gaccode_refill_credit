@@ -89,7 +89,7 @@ python3 auto_reset_credits_advanced.py
 ## 常用命令
 
 ```bash
-# 基本运行
+# 基本运行（包含公告检查）
 python auto_reset_credits_advanced.py
 
 # 查看积分余额
@@ -98,12 +98,39 @@ python auto_reset_credits_advanced.py --check-balance
 # 测试连接（不创建工单）
 python auto_reset_credits_advanced.py --dry-run
 
+# 跳过公告检查
+python auto_reset_credits_advanced.py --skip-announcements
+
+# 测试邮件通知
+python auto_reset_credits_advanced.py --test-email
+
 # 使用自定义配置文件
 python auto_reset_credits_advanced.py --config my_config.json
 
 # 命令行直接传 token（不使用配置文件）
 python auto_reset_credits_advanced.py --token "YOUR_TOKEN_HERE"
 ```
+
+## ✨ 新功能：系统公告自动通知
+
+脚本现在会自动检查 GAC 系统公告：
+
+- **自动检查**: 每次运行时检查系统公告
+- **邮件通知**: 有新公告时自动发送邮件
+- **多种类型**: 支持信息、警告、错误等不同类型公告
+- **可选功能**: 可使用 `--skip-announcements` 跳过
+
+**示例输出:**
+```
+[STEP -1.5] Checking system announcements...
+[INFO] Found 1 announcement(s):
+  [1] Title: 订阅即将过期
+      Type: warning
+      Created: N/A
+[INFO] ✓ Announcement notification sent!
+```
+
+详细说明请查看：`docs/ANNOUNCEMENT_FEATURE.md`
 
 ## 一键运行脚本
 

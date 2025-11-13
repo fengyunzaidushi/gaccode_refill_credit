@@ -414,6 +414,39 @@ class CreditResetBot:
             print(f"[ERROR] Failed to get credit balance: {e}")
             return None
     
+    def check_announcements(self):
+        """
+        Check for system announcements
+        
+        Returns:
+            list: List of announcements
+        """
+        url = f"{self.base_url}/announcements"
+        headers = self.headers.copy()
+        headers['referer'] = 'https://gaccode.com/dashboard'
+        
+        try:
+            response = requests.get(url, headers=headers, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            
+            announcements = data.get('announcements', [])
+            
+            if announcements:
+                print(f"[INFO] Found {len(announcements)} announcement(s):")
+                for idx, announcement in enumerate(announcements, 1):
+                    print(f"  [{idx}] Title: {announcement.get('title', 'N/A')}")
+                    print(f"      Type: {announcement.get('type', 'N/A')}")
+                    print(f"      Created: {announcement.get('createdAt', 'N/A')}")
+            else:
+                print("[INFO] No announcements found")
+            
+            return announcements
+            
+        except requests.exceptions.RequestException as e:
+            print(f"[ERROR] Failed to check announcements: {e}")
+            return None
+    
     def send_email_alert(self, subject, body, alert_type="info"):
         """
         Send email alert notification
@@ -493,13 +526,14 @@ GAC积分重置工具通知
             import traceback
             print(f"[DEBUG] Email error details: {traceback.format_exc()}")
     
-    def run(self, check_balance=False, skip_subscription_check=False):
+    def run(self, check_balance=False, skip_subscription_check=False, check_announcements=True):
         """
         Run the complete credit reset process
         
         Args:
             check_balance: Whether to check balance before and after
             skip_subscription_check: Skip subscription check (for testing)
+            check_announcements: Whether to check system announcements
             
         Returns:
             bool: True if successful, False otherwise
@@ -518,6 +552,32 @@ GAC积分重置工具通知
                 print("=" * 60)
                 return False
             print("[INFO] ✓ Authentication token obtained and saved!")
+        
+        # Step -1.5: Check system announcements
+        if check_announcements:
+            print("\n[STEP -1.5] Checking system announcements...")
+            announcements = self.check_announcements()
+            
+            if announcements:
+                # Format announcements for email
+                announcement_text = ""
+                for idx, announcement in enumerate(announcements, 1):
+                    announcement_text += f"\n公告 {idx}:\n"
+                    announcement_text += f"标题: {announcement.get('title', 'N/A')}\n"
+                    announcement_text += f"类型: {announcement.get('type', 'N/A')}\n"
+                    announcement_text += f"内容: {announcement.get('content', announcement.get('message', 'N/A'))}\n"
+                    announcement_text += f"发布时间: {announcement.get('createdAt', 'N/A')}\n"
+                    announcement_text += "-" * 40
+                
+                # Send announcement email
+                self.send_email_alert(
+                    f"系统公告 ({len(announcements)}条)",
+                    f"GAC系统有新的公告信息:\n{announcement_text}\n\n请访问 https://gaccode.com/dashboard 查看详情。",
+                    "info"
+                )
+                print("[INFO] ✓ Announcement notification sent!")
+            else:
+                print("[INFO] ✓ No announcements to notify")
         
         # Step -1: Check active subscription
         if not skip_subscription_check:
@@ -597,6 +657,11 @@ GAC积分重置工具通知
         if not recaptcha_status:
             print("[FAILED] Could not check recaptcha status")
             return False
+        
+        # 🔴 测试模式：在这里停止，不创建工单
+        # 取消下面两行注释来启用测试模式
+        # print("\n[TEST MODE] Stopping before creating ticket...")
+        # return True
         
         if recaptcha_status.get('requiresRecaptcha', False):
             print("[FAILED] Recaptcha is required. Manual intervention needed.")
@@ -746,6 +811,12 @@ Examples:
         help='Test email notification functionality'
     )
     
+    parser.add_argument(
+        '--skip-announcements',
+        action='store_true',
+        help='Skip checking system announcements'
+    )
+    
     args = parser.parse_args()
     
     # Load configuration
@@ -810,7 +881,8 @@ Examples:
         # Run the bot
         success = bot.run(
             check_balance=args.check_balance,
-            skip_subscription_check=args.skip_subscription_check
+            skip_subscription_check=args.skip_subscription_check,
+            check_announcements=not args.skip_announcements
         )
         
         if success:
