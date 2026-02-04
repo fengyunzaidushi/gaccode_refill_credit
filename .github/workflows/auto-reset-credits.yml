@@ -2,9 +2,9 @@ name: GAC 自动重置积分
 
 # 触发器
 on:
-  # 定时触发（每天北京时间 22:51 = UTC 14:51）
+  
   schedule:
-    - cron: "51 12 * * *"
+    - cron: "55 15 * * *"
 
   # 允许手动触发
   workflow_dispatch:
